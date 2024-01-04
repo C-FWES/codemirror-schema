@@ -43,15 +43,27 @@ export const codeBlockSchema = $nodeSchema('code_block', (ctx) => {
       },
     ],
     toDOM: (node) => {
-      const attr = ctx.get(codeBlockAttr.key)(node)
-      return [
-        'pre',
-        {
-          ...attr.pre,
-          'data-language': node.attrs.language,
-        },
-        ['code', attr.code, 0],
-      ]
+      const attr = ctx.get(codeBlockAttr.key)(node);
+  const language = node.attrs.language;
+  
+  const codeMirrorAttrs = {
+    'data-language': language,
+    'cm-type': 'block', // This attribute indicates that it's a block in CodeMirror 6.
+  };
+
+  return [
+    'div',
+    { class: 'cm-content', ...attr.pre }, // You can add other attributes as needed.
+    [
+      'div',
+      { class: 'cm-line' },
+      [
+        'span',
+        { class: 'cm-content', ...codeMirrorAttrs },
+        ['span', { class: 'cm-string' }, 0], // Placeholder for the cursor.
+      ],
+    ],
+  ];
     },
     parseMarkdown: {
       match: ({ type }) => type === 'code',
